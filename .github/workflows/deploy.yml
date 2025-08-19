@@ -21,9 +21,11 @@ jobs:
         with:
           node-version: 20
 
-      # 3️⃣ 设置 npm 官方 registry
-      - name: Set npm registry
-        run: npm config set registry https://registry.npmjs.org/
+      # 3️⃣ 强制使用官方 npm registry
+      - name: Force npm registry
+        run: |
+          npm config set registry https://registry.npmjs.org/
+          npm config delete registry
 
       # 4️⃣ 缓存 npm 全局缓存
       - name: Cache npm
@@ -43,9 +45,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-modules-
 
-      # 6️⃣ 安装依赖
+      # 6️⃣ 安装依赖（指定 registry + 重试）
       - name: Install dependencies
-        run: npm install --retry 5
+        run: npm install --registry=https://registry.npmjs.org/ --retry 5
 
       # 7️⃣ 部署微米AI Worker（自动重试一次）
       - name: Deploy to Cloudflare
@@ -54,4 +56,8 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      # 8️⃣ 输出 Worker URL
+      - name: Show Worker URL
+        run: echo "微米AI Worker 已部署，访问网址: https://ai.whyme.uno"
 

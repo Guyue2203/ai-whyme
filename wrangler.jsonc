@@ -4,17 +4,30 @@
  */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "hello-ai",
+	"name": "morning-cell-0482",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-08-03",
 	"observability": {
 		"enabled": true
-	}
+	},
+	"ai": {
+    	"binding": "AI"
+    },
+  // Add this to your wrangler.jsonc
+  "kv_namespaces": [
+    {
+      "binding": "hello-ai-kv",
+      "id": "97e63f57b51f45b7a1f65847a339f6d7",
+      
+      // Optional: preview_id used when running `wrangler dev` for local dev
+      //"preview_id": "<ID_OF_PREVIEW_KV_NAMESPACE_FOR_LOCAL_DEVELOPMENT>"
+    }
+  ],
 	/**
-	 * Smart Placement
+	 * Smart Placement - 启用智能放置以优化性能
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
 	 */
-	// "placement": { "mode": "smart" },
+	"placement": { "mode": "smart" },
 
 	/**
 	 * Bindings
@@ -27,7 +40,11 @@
 	 * Environment Variables
 	 * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
 	 */
-	// "vars": { "MY_VARIABLE": "production_value" },
+	"vars": {
+		"APP_NAME": "whyme.uno AI Chat",
+		"VERSION": "1.0.0",
+		"CACHE_TTL": "60"
+	},
 	/**
 	 * Note: Use secrets to store sensitive data.
 	 * https://developers.cloudflare.com/workers/configuration/secrets/
@@ -44,4 +61,6 @@
 	 * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings
 	 */
 	// "services": [{ "binding": "MY_SERVICE", "service": "my-service" }]
+
 }
+

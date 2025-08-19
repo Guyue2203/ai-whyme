@@ -57,7 +57,3 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
-      # 8️⃣ 输出 Worker URL
-      - name: Show Worker URL
-        run: echo "微米AI Worker 已部署，访问网址: https://ai.whyme.uno"
-

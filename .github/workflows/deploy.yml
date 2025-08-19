@@ -1,4 +1,4 @@
-name: Deploy Cloudflare Worker
+name: Deploy 微米AI Worker
 
 # 触发条件：每次 push 到 main 分支
 on:
@@ -11,23 +11,47 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. 拉取仓库
-      - name: Checkout repo
+      # 1️⃣ 检出仓库
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2. 设置 Node.js
-      - name: Setup Node
+      # 2️⃣ 安装 Node.js 20
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 20
 
-      # 3. 安装依赖
-      - name: Install dependencies
-        run: npm install
+      # 3️⃣ 设置 npm 官方 registry
+      - name: Set npm registry
+        run: npm config set registry https://registry.npmjs.org/
 
-      # 4. 部署 Worker
+      # 4️⃣ 缓存 npm 全局缓存
+      - name: Cache npm
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      # 5️⃣ 缓存 node_modules
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      # 6️⃣ 安装依赖
+      - name: Install dependencies
+        run: npm install --retry 5
+
+      # 7️⃣ 部署微米AI Worker（自动重试一次）
       - name: Deploy to Cloudflare
-        run: npx wrangler deploy
+        run: |
+          npx wrangler deploy || npx wrangler deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+

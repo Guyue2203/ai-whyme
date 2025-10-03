@@ -401,6 +401,12 @@ const indexHtml = `<!doctype html>
             <span id="user-email" class="text-gray-700 dark:text-gray-300 font-medium"></span>
           </div>
           <div class="flex items-center space-x-2">
+            <button id="new-chat" class="text-green-500 hover:text-green-600 text-sm font-medium flex items-center space-x-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+              <span>新建对话</span>
+            </button>
             <button id="view-history" class="text-blue-500 hover:text-blue-600 text-sm font-medium">查看历史</button>
             <button id="logout" class="text-red-500 hover:text-red-600 text-sm font-medium">退出登录</button>
           </div>
@@ -898,6 +904,23 @@ function logout() {
   showStatus('已退出登录');
 }
 
+function newChat() {
+  // 清空当前对话
+  histEl.innerHTML = '';
+  
+  // 清空输入框
+  promptEl.value = '';
+  updateSendButton();
+  
+  // 显示状态提示
+  showStatus('新对话已开始');
+  
+  // 添加欢迎消息
+  if (currentUser) {
+    append('assistant', '你好！我是微米AI助手，有什么可以帮助你的吗？');
+  }
+}
+
 function updateUI() {
   if (currentUser) {
     userInfo.classList.remove('hidden');
@@ -935,13 +958,22 @@ async function loadHistory() {
       const history = await response.json();
       histEl.innerHTML = '';
       
-      history.forEach(conv => {
-        append('user', conv.user);
-        append('assistant', conv.assistant);
-      });
+      if (history.length > 0) {
+        // 如果有历史记录，显示历史对话
+        history.forEach(conv => {
+          append('user', conv.user);
+          append('assistant', conv.assistant);
+        });
+        showStatus('历史对话已加载');
+      } else {
+        // 如果没有历史记录，显示欢迎消息
+        append('assistant', '你好！我是微米AI助手，有什么可以帮助你的吗？');
+      }
     }
   } catch (error) {
     console.error('加载历史失败:', error);
+    // 如果加载失败，显示欢迎消息
+    append('assistant', '你好！我是微米AI助手，有什么可以帮助你的吗？');
   }
 }
 
@@ -1092,6 +1124,7 @@ async function send() {
   // 用户操作
   document.getElementById('logout')?.addEventListener('click', logout);
   document.getElementById('view-history')?.addEventListener('click', loadHistory);
+  document.getElementById('new-chat')?.addEventListener('click', newChat);
 
   // 登录按钮事件
   if (authButton) {

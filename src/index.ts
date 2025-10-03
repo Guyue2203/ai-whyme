@@ -161,6 +161,24 @@ const indexHtml = `<!doctype html>
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
   
+  /* 输入框文本样式 */
+  #prompt {
+    color: #111827 !important;
+    background: transparent !important;
+  }
+  
+  .dark #prompt {
+    color: #f9fafb !important;
+  }
+  
+  #prompt::placeholder {
+    color: #6b7280 !important;
+  }
+  
+  .dark #prompt::placeholder {
+    color: #9ca3af !important;
+  }
+  
   /* 发送按钮样式 */
   .send-button {
     position: absolute;
@@ -285,8 +303,105 @@ const indexHtml = `<!doctype html>
       </div>
     </header>
 
+    <!-- 登录/注册模态框 -->
+    <div id="auth-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 id="auth-title" class="text-xl font-bold text-gray-900 dark:text-white">登录</h2>
+          <button id="close-auth" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        
+        <!-- 登录表单 -->
+        <div id="login-form">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">邮箱</label>
+              <input type="email" id="login-email" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请输入邮箱">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">密码</label>
+              <input type="password" id="login-password" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请输入密码">
+            </div>
+            <button id="login-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg transition-colors">
+              登录
+            </button>
+            <div class="text-center">
+              <span class="text-gray-600 dark:text-gray-400">还没有账号？</span>
+              <button id="switch-to-register" class="text-blue-500 hover:text-blue-600 font-medium">立即注册</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 注册表单 -->
+        <div id="register-form" class="hidden">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">邮箱</label>
+              <input type="email" id="register-email" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请输入邮箱">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">密码</label>
+              <input type="password" id="register-password" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请输入密码">
+            </div>
+            <button id="register-btn" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg transition-colors">
+              注册
+            </button>
+            <div class="text-center">
+              <span class="text-gray-600 dark:text-gray-400">已有账号？</span>
+              <button id="switch-to-login" class="text-blue-500 hover:text-blue-600 font-medium">立即登录</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 验证表单 -->
+        <div id="verify-form" class="hidden">
+          <div class="space-y-4">
+            <div class="text-center">
+              <div class="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">验证邮箱</h3>
+              <p class="text-gray-600 dark:text-gray-400 mb-4">我们已向您的邮箱发送了验证码，请查收并输入验证码</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">验证码</label>
+              <input type="text" id="verify-code" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请输入6位验证码">
+            </div>
+            <button id="verify-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg transition-colors">
+              验证
+            </button>
+            <div class="text-center">
+              <button id="resend-code" class="text-blue-500 hover:text-blue-600 font-medium">重新发送验证码</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 主聊天区域 -->
     <main class="flex-1 flex flex-col">
+      <!-- 用户信息栏 -->
+      <div id="user-info" class="hidden border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+              <span class="text-white font-bold text-sm">U</span>
+            </div>
+            <span id="user-email" class="text-gray-700 dark:text-gray-300 font-medium"></span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button id="view-history" class="text-blue-500 hover:text-blue-600 text-sm font-medium">查看历史</button>
+            <button id="logout" class="text-red-500 hover:text-red-600 text-sm font-medium">退出登录</button>
+          </div>
+        </div>
+      </div>
+      
       <!-- 消息列表 -->
       <div id="history" class="flex-1 overflow-y-auto"></div>
       
@@ -600,6 +715,20 @@ const sendBtn = document.getElementById("sendBtn");
 const promptEl = document.getElementById("prompt");
 const themeToggle = document.getElementById('theme-toggle');
 
+// 认证相关元素
+const authModal = document.getElementById('auth-modal');
+const closeAuth = document.getElementById('close-auth');
+const loginForm = document.getElementById('login-form');
+const registerForm = document.getElementById('register-form');
+const verifyForm = document.getElementById('verify-form');
+const userInfo = document.getElementById('user-info');
+const userEmail = document.getElementById('user-email');
+
+// 认证状态
+let currentUser = null;
+let authToken = null;
+let pendingEmail = null;
+
 function append(role, text) {
   const messageDiv = document.createElement('div');
   messageDiv.className = 'message-' + role;
@@ -642,6 +771,174 @@ function showStatus(message, isError = false) {
   }, 3000);
 }
 
+// 认证相关函数
+function showAuthModal() {
+  authModal.classList.remove('hidden');
+  showLoginForm();
+}
+
+function hideAuthModal() {
+  authModal.classList.add('hidden');
+}
+
+function showLoginForm() {
+  loginForm.classList.remove('hidden');
+  registerForm.classList.add('hidden');
+  verifyForm.classList.add('hidden');
+  document.getElementById('auth-title').textContent = '登录';
+}
+
+function showRegisterForm() {
+  loginForm.classList.add('hidden');
+  registerForm.classList.remove('hidden');
+  verifyForm.classList.add('hidden');
+  document.getElementById('auth-title').textContent = '注册';
+}
+
+function showVerifyForm() {
+  loginForm.classList.add('hidden');
+  registerForm.classList.add('hidden');
+  verifyForm.classList.remove('hidden');
+  document.getElementById('auth-title').textContent = '验证邮箱';
+}
+
+async function register() {
+  const email = document.getElementById('register-email').value;
+  const password = document.getElementById('register-password').value;
+  
+  if (!email || !password) {
+    showStatus('请填写完整信息', true);
+    return;
+  }
+  
+  try {
+    const response = await fetch('/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      pendingEmail = email;
+      showVerifyForm();
+      showStatus(data.message);
+    } else {
+      showStatus(data.error, true);
+    }
+  } catch (error) {
+    showStatus('注册失败，请稍后重试', true);
+  }
+}
+
+async function verifyEmail() {
+  const code = document.getElementById('verify-code').value;
+  
+  if (!code) {
+    showStatus('请输入验证码', true);
+    return;
+  }
+  
+  try {
+    const response = await fetch('/api/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: pendingEmail, code })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      showStatus(data.message);
+      showLoginForm();
+      document.getElementById('login-email').value = pendingEmail;
+    } else {
+      showStatus(data.error, true);
+    }
+  } catch (error) {
+    showStatus('验证失败，请稍后重试', true);
+  }
+}
+
+async function login() {
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+  
+  if (!email || !password) {
+    showStatus('请填写完整信息', true);
+    return;
+  }
+  
+  try {
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      authToken = data.token;
+      currentUser = data.email;
+      localStorage.setItem('authToken', authToken);
+      localStorage.setItem('currentUser', currentUser);
+      
+      hideAuthModal();
+      updateUI();
+      showStatus('登录成功');
+      loadHistory();
+    } else {
+      showStatus(data.error, true);
+    }
+  } catch (error) {
+    showStatus('登录失败，请稍后重试', true);
+  }
+}
+
+function logout() {
+  authToken = null;
+  currentUser = null;
+  localStorage.removeItem('authToken');
+  localStorage.removeItem('currentUser');
+  
+  updateUI();
+  histEl.innerHTML = '';
+  showStatus('已退出登录');
+}
+
+function updateUI() {
+  if (currentUser) {
+    userInfo.classList.remove('hidden');
+    userEmail.textContent = currentUser;
+  } else {
+    userInfo.classList.add('hidden');
+  }
+}
+
+async function loadHistory() {
+  if (!authToken) return;
+  
+  try {
+    const response = await fetch('/api/history', {
+      headers: { 'Authorization': \`Bearer \${authToken}\` }
+    });
+    
+    if (response.ok) {
+      const history = await response.json();
+      histEl.innerHTML = '';
+      
+      history.forEach(conv => {
+        append('user', conv.user);
+        append('assistant', conv.assistant);
+      });
+    }
+  } catch (error) {
+    console.error('加载历史失败:', error);
+  }
+}
+
 // 主题切换功能
 function toggleTheme() {
   const isDark = document.documentElement.classList.contains('dark');
@@ -674,6 +971,12 @@ async function send() {
    const prompt = promptEl.value.trim();
    if (!prompt) return;
    
+   // 检查是否已登录
+   if (!currentUser) {
+     showAuthModal();
+     return;
+   }
+   
    // 禁用发送按钮
    sendBtn.disabled = true;
    
@@ -686,9 +989,14 @@ async function send() {
    const messageContent = append("assistant", '<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>');
 
    try {
+     const headers = { "Content-Type": "application/json" };
+     if (authToken) {
+       headers['Authorization'] = \`Bearer \${authToken}\`;
+     }
+     
      const res = await fetch("/api", {
        method: "POST",
-       headers: { "Content-Type": "application/json" },
+       headers,
        body: JSON.stringify({ prompt })
      });
      const data = await res.json();
@@ -745,12 +1053,55 @@ async function send() {
   // 更新发送按钮状态
   updateSendButton();
 
+  // 初始化认证状态
+  authToken = localStorage.getItem('authToken');
+  currentUser = localStorage.getItem('currentUser');
+  updateUI();
+  
+  if (currentUser) {
+    loadHistory();
+  }
+
   // 初始化主题
   initializeTheme();
 
   // 绑定主题切换事件
   if (themeToggle) {
     themeToggle.addEventListener('click', toggleTheme);
+  }
+
+  // 认证相关事件监听器
+  if (closeAuth) {
+    closeAuth.addEventListener('click', hideAuthModal);
+  }
+
+  // 登录/注册切换
+  document.getElementById('switch-to-register')?.addEventListener('click', showRegisterForm);
+  document.getElementById('switch-to-login')?.addEventListener('click', showLoginForm);
+
+  // 表单提交
+  document.getElementById('login-btn')?.addEventListener('click', login);
+  document.getElementById('register-btn')?.addEventListener('click', register);
+  document.getElementById('verify-btn')?.addEventListener('click', verifyEmail);
+
+  // 用户操作
+  document.getElementById('logout')?.addEventListener('click', logout);
+  document.getElementById('view-history')?.addEventListener('click', loadHistory);
+
+  // 点击输入框时检查登录状态
+  promptEl.addEventListener('focus', function() {
+    if (!currentUser) {
+      showAuthModal();
+    }
+  });
+
+  // 点击模态框背景关闭
+  if (authModal) {
+    authModal.addEventListener('click', function(e) {
+      if (e.target === authModal) {
+        hideAuthModal();
+      }
+    });
   }`;
 
 // 静态文件内容
@@ -778,10 +1129,203 @@ function hashString(s: string): number {
   return h >>> 0;
 }
 
+// 用户认证相关函数
+async function hashPassword(password: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function generateToken(): string {
+  const array = new Uint8Array(32);
+  crypto.getRandomValues(array);
+  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+function generateVerificationCode(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+async function sendVerificationEmail(email: string, code: string): Promise<boolean> {
+  // 这里应该集成真实的邮件服务，如 SendGrid, AWS SES 等
+  // 现在只是模拟发送
+  console.log(`发送验证码到 ${email}: ${code}`);
+  return true;
+}
+
 export default {
   async fetch(request: Request, env: any, ctx: ExecutionContext): Promise<Response> {
     try {
       const url = new URL(request.url);
+      
+      // 用户注册
+      if (url.pathname === "/api/register" && request.method === "POST") {
+        const { email, password } = await request.json() as { email?: string; password?: string };
+        
+        if (!email || !password) {
+          return new Response(JSON.stringify({ error: "邮箱和密码不能为空" }), {
+            headers: { "Content-Type": "application/json" },
+            status: 400,
+          });
+        }
+        
+        // 检查邮箱格式
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          return new Response(JSON.stringify({ error: "邮箱格式不正确" }), {
+            headers: { "Content-Type": "application/json" },
+            status: 400,
+          });
+        }
+        
+        // 检查用户是否已存在
+        const existingUser = await env['hello-ai-kv']?.get(`user:${email}`);
+        if (existingUser) {
+          return new Response(JSON.stringify({ error: "该邮箱已被注册" }), {
+            headers: { "Content-Type": "application/json" },
+            status: 400,
+          });
+        }
+        
+        // 生成验证码
+        const verificationCode = generateVerificationCode();
+        const hashedPassword = await hashPassword(password);
+        
+        // 存储用户信息（待验证状态）
+        await env['hello-ai-kv']?.put(`user:${email}`, JSON.stringify({
+          email,
+          password: hashedPassword,
+          verified: false,
+          verificationCode,
+          createdAt: Date.now()
+        }), { expirationTtl: 3600 }); // 1小时过期
+        
+        // 发送验证邮件
+        await sendVerificationEmail(email, verificationCode);
+        
+        return new Response(JSON.stringify({ 
+          message: "验证码已发送到您的邮箱，请查收并验证" 
+        }), {
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      
+      // 验证邮箱
+      if (url.pathname === "/api/verify" && request.method === "POST") {
+        const { email, code } = await request.json() as { email?: string; code?: string };
+        
+        if (!email || !code) {
+          return new Response(JSON.stringify({ error: "邮箱和验证码不能为空" }), {
+            headers: { "Content-Type": "application/json" },
+            status: 400,
+          });
+        }
+        
+        const userData = await env['hello-ai-kv']?.get(`user:${email}`);
+        if (!userData) {
+          return new Response(JSON.stringify({ error: "用户不存在或验证码已过期" }), {
+            headers: { "Content-Type": "application/json" },
+            status: 400,
+          });
+        }
+        
+        const user = JSON.parse(userData);
+        if (user.verificationCode !== code) {
+          return new Response(JSON.stringify({ error: "验证码不正确" }), {
+            headers: { "Content-Type": "application/json" },
+            status: 400,
+          });
+        }
+        
+        // 更新用户状态为已验证
+        user.verified = true;
+        delete user.verificationCode;
+        await env['hello-ai-kv']?.put(`user:${email}`, JSON.stringify(user));
+        
+        return new Response(JSON.stringify({ 
+          message: "邮箱验证成功，现在可以登录了" 
+        }), {
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      
+      // 用户登录
+      if (url.pathname === "/api/login" && request.method === "POST") {
+        const { email, password } = await request.json() as { email?: string; password?: string };
+        
+        if (!email || !password) {
+          return new Response(JSON.stringify({ error: "邮箱和密码不能为空" }), {
+            headers: { "Content-Type": "application/json" },
+            status: 400,
+          });
+        }
+        
+        const userData = await env['hello-ai-kv']?.get(`user:${email}`);
+        if (!userData) {
+          return new Response(JSON.stringify({ error: "用户不存在" }), {
+            headers: { "Content-Type": "application/json" },
+            status: 401,
+          });
+        }
+        
+        const user = JSON.parse(userData);
+        if (!user.verified) {
+          return new Response(JSON.stringify({ error: "请先验证邮箱" }), {
+            headers: { "Content-Type": "application/json" },
+            status: 401,
+          });
+        }
+        
+        const hashedPassword = await hashPassword(password);
+        if (user.password !== hashedPassword) {
+          return new Response(JSON.stringify({ error: "密码错误" }), {
+            headers: { "Content-Type": "application/json" },
+            status: 401,
+          });
+        }
+        
+        // 生成会话token
+        const token = generateToken();
+        await env['hello-ai-kv']?.put(`session:${token}`, JSON.stringify({
+          email,
+          loginTime: Date.now()
+        }), { expirationTtl: 86400 * 7 }); // 7天过期
+        
+        return new Response(JSON.stringify({ 
+          token,
+          email: user.email 
+        }), {
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      
+      // 获取用户对话历史
+      if (url.pathname === "/api/history" && request.method === "GET") {
+        const token = request.headers.get('Authorization')?.replace('Bearer ', '');
+        if (!token) {
+          return new Response(JSON.stringify({ error: "未授权" }), {
+            headers: { "Content-Type": "application/json" },
+            status: 401,
+          });
+        }
+        
+        const sessionData = await env['hello-ai-kv']?.get(`session:${token}`);
+        if (!sessionData) {
+          return new Response(JSON.stringify({ error: "会话已过期" }), {
+            headers: { "Content-Type": "application/json" },
+            status: 401,
+          });
+        }
+        
+        const session = JSON.parse(sessionData);
+        const history = await env['hello-ai-kv']?.get(`history:${session.email}`) || '[]';
+        
+        return new Response(history, {
+          headers: { "Content-Type": "application/json" },
+        });
+      }
       
       if (url.pathname === "/api" && request.method === "POST") {
         const requestBody = await request.json() as { prompt?: string };
@@ -791,6 +1335,18 @@ export default {
             headers: { "Content-Type": "application/json" },
             status: 400,
           });
+        }
+
+        // 检查用户认证
+        const token = request.headers.get('Authorization')?.replace('Bearer ', '');
+        let userEmail = null;
+        
+        if (token) {
+          const sessionData = await env['hello-ai-kv']?.get(`session:${token}`);
+          if (sessionData) {
+            const session = JSON.parse(sessionData);
+            userEmail = session.email;
+          }
         }
 
         // 可选：做简单缓存（根据 prompt ）
@@ -825,6 +1381,26 @@ export default {
            await env['hello-ai-kv'].put(cacheKey, JSON.stringify(body), {
              expirationTtl: cacheTtl,
            });
+        }
+
+        // 如果用户已登录，保存对话历史
+        if (userEmail) {
+          const conversation = {
+            user: prompt,
+            assistant: body.output,
+            timestamp: Date.now()
+          };
+          
+          const existingHistory = await env['hello-ai-kv']?.get(`history:${userEmail}`) || '[]';
+          const history = JSON.parse(existingHistory);
+          history.push(conversation);
+          
+          // 只保留最近100条对话
+          if (history.length > 100) {
+            history.splice(0, history.length - 100);
+          }
+          
+          await env['hello-ai-kv']?.put(`history:${userEmail}`, JSON.stringify(history));
         }
 
         return new Response(JSON.stringify(body), {

@@ -85,6 +85,7 @@ const indexHtml = `<!doctype html>
     font-weight: 600;
     font-size: 14px;
     flex-shrink: 0;
+    overflow: hidden;
   }
   
   .avatar-user {
@@ -93,28 +94,47 @@ const indexHtml = `<!doctype html>
   }
   
   .avatar-assistant {
-    background: #059669;
-    color: white;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+  }
+  
+  .dark .avatar-assistant {
+    background: #374151;
+    border-color: #4b5563;
+  }
+  
+  .avatar-assistant img {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
   }
   
   /* 消息内容样式 */
   .message-content {
     flex: 1;
     line-height: 1.7;
-    color: #1f2937;
+    color: #111827;
     font-size: 15px;
   }
   
   .dark .message-content {
-    color: #f1f5f9;
+    color: #f9fafb;
   }
   
   .message-user .message-content {
-    color: #1f2937;
+    color: #111827;
   }
   
   .dark .message-user .message-content {
-    color: #f1f5f9;
+    color: #f9fafb;
+  }
+  
+  .message-assistant .message-content {
+    color: #374151;
+  }
+  
+  .dark .message-assistant .message-content {
+    color: #e5e7eb;
   }
   
   /* 输入框样式 */
@@ -589,7 +609,16 @@ function append(role, text) {
   
   const avatar = document.createElement('div');
   avatar.className = 'avatar avatar-' + role;
-  avatar.textContent = role === 'user' ? '你' : '微';
+  
+  if (role === 'user') {
+    avatar.textContent = '你';
+  } else {
+    // 微米AI使用网页图标
+    const img = document.createElement('img');
+    img.src = 'https://s.guyue.me/img/icon_whyme.png';
+    img.alt = '微米AI';
+    avatar.appendChild(img);
+  }
   
   const content = document.createElement('div');
   content.className = 'message-content';

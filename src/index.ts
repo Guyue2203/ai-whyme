@@ -13,11 +13,12 @@
 
 // 读取静态文件内容
 const indexHtml = `<!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" class="notranslate" translate="no">
 <head>
 <meta charset="utf-8" />
 <title>微米 - 智能对话助手</title>
 <meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="description" content="微米 AI 助手 - 您的智能对话伙伴，提供编程、写作、学习等全方位AI支持" />
 <link rel="icon" type="image/png" href="https://s.guyue.me/img/icon_whyme.png" />
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
@@ -26,8 +27,9 @@ const indexHtml = `<!doctype html>
     theme: {
       extend: {
         colors: {
-          primary: '#3B82F6',
-          secondary: '#10B981',
+          primary: '#2563eb',
+          secondary: '#059669',
+          accent: '#7c3aed',
         },
         fontFamily: {
           sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -37,36 +39,138 @@ const indexHtml = `<!doctype html>
   }
 </script>
 <style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
   body { 
-    font-family: 'Inter', system-ui, sans-serif; 
+    font-family: 'Inter', system-ui, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   
-  .message-bubble {
-    padding: 12px 16px;
-    border-radius: 8px;
-    max-width: 80%;
-    line-height: 1.5;
+  /* 消息容器样式 */
+  .message-container {
+    max-width: 768px;
+    margin: 0 auto;
+    padding: 24px 16px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  
+  .message-user .message-container {
+    background: transparent;
+  }
+  
+  .message-assistant .message-container {
+    background: #f8fafc;
+  }
+  
+  .dark .message-assistant .message-container {
+    background: #1e293b;
+  }
+  
+  /* 头像样式 */
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
     font-size: 14px;
-    margin-bottom: 8px;
+    flex-shrink: 0;
   }
   
-  .message-user {
-    background: #3B82F6;
+  .avatar-user {
+    background: #2563eb;
     color: white;
-    margin-left: auto;
   }
   
-  .message-assistant {
-    background: #f3f4f6;
-    color: #374151;
-    margin-right: auto;
+  .avatar-assistant {
+    background: #059669;
+    color: white;
   }
   
-  .dark .message-assistant {
+  /* 消息内容样式 */
+  .message-content {
+    flex: 1;
+    line-height: 1.7;
+    color: #1f2937;
+    font-size: 15px;
+  }
+  
+  .dark .message-content {
+    color: #f1f5f9;
+  }
+  
+  .message-user .message-content {
+    color: #1f2937;
+  }
+  
+  .dark .message-user .message-content {
+    color: #f1f5f9;
+  }
+  
+  /* 输入框样式 */
+  .input-container {
+    position: relative;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+  }
+  
+  .dark .input-container {
     background: #374151;
-    color: #f3f4f6;
+    border-color: #4b5563;
   }
   
+  .input-container:focus-within {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+  
+  .dark .input-container:focus-within {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+  
+  /* 发送按钮样式 */
+  .send-button {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    width: 36px;
+    height: 36px;
+    background: #2563eb;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+  
+  .send-button:hover {
+    background: #1d4ed8;
+    transform: scale(1.05);
+  }
+  
+  .send-button:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+  }
+  
+  /* 打字指示器 */
   .typing-indicator {
     display: flex;
     gap: 4px;
@@ -88,54 +192,111 @@ const indexHtml = `<!doctype html>
     0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
     40% { transform: scale(1); opacity: 1; }
   }
+  
+  /* 状态提示 */
+  .status-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1f2937;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .status-toast.show {
+    opacity: 1;
+  }
+  
+  /* 滚动条样式 */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
+  
+  .dark ::-webkit-scrollbar-thumb {
+    background: #4b5563;
+  }
+  
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+  }
 </style>
 <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 min-h-screen">
-  <div class="min-h-screen flex flex-col items-center justify-start p-6">
-    <!-- 简洁的标题栏 -->
-    <div class="w-full max-w-2xl mb-6">
-      <div class="flex items-center justify-between mb-4">
-        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">微米 AI 助手</h1>
-        <button id="theme-toggle" class="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-          <span class="dark:hidden">🌙</span>
-          <span class="hidden dark:inline">☀️</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- 聊天区域 -->
-    <div class="w-full max-w-2xl bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col" style="height: 500px;">
-      <!-- 消息列表 -->
-      <div id="history" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
-      
-      <!-- 输入区域 -->
-      <div class="border-t border-gray-200 dark:border-gray-700 p-4">
-        <div class="flex items-end space-x-3">
-          <div class="flex-1">
-            <textarea 
-              id="prompt" 
-              placeholder="向微米发送消息..." 
-              class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-              rows="1"
-            ></textarea>
+<body class="bg-white dark:bg-gray-900 min-h-screen">
+  <div class="min-h-screen flex flex-col">
+    <!-- 顶部导航栏 -->
+    <header class="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+      <div class="max-w-4xl mx-auto px-4 py-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+              <span class="text-white font-bold text-sm">微</span>
+            </div>
+            <h1 class="text-xl font-semibold text-gray-900 dark:text-white">微米 AI</h1>
           </div>
-          <button 
-            id="sendBtn" 
-            onclick="send()"
-            class="bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            disabled
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+          <button id="theme-toggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            <svg class="w-5 h-5 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+            </svg>
+            <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
             </svg>
           </button>
         </div>
-        <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
-          按 Enter 发送消息，Shift+Enter 换行
+      </div>
+    </header>
+
+    <!-- 主聊天区域 -->
+    <main class="flex-1 flex flex-col">
+      <!-- 消息列表 -->
+      <div id="history" class="flex-1 overflow-y-auto"></div>
+      
+      <!-- 输入区域 -->
+      <div class="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+        <div class="max-w-4xl mx-auto p-4">
+          <div class="input-container">
+            <textarea 
+              id="prompt" 
+              placeholder="向微米发送消息..." 
+              class="w-full p-4 pr-12 bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none resize-none"
+              rows="1"
+            ></textarea>
+            <button 
+              id="sendBtn" 
+              onclick="send()"
+              class="send-button"
+              disabled
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+              </svg>
+            </button>
+          </div>
+          <div class="mt-2 text-xs text-gray-500 dark:text-gray-400 text-center">
+            按 Enter 发送消息，Shift+Enter 换行
+          </div>
         </div>
       </div>
-    </div>
+    </main>
   </div>
   
   <div class="status" id="out"></div>
@@ -421,20 +582,34 @@ const themeToggle = document.getElementById('theme-toggle');
 
 function append(role, text) {
   const messageDiv = document.createElement('div');
-  messageDiv.className = 'message-bubble message-' + role;
-  messageDiv.innerHTML = text;
+  messageDiv.className = 'message-' + role;
+  
+  const container = document.createElement('div');
+  container.className = 'message-container';
+  
+  const avatar = document.createElement('div');
+  avatar.className = 'avatar avatar-' + role;
+  avatar.textContent = role === 'user' ? '你' : '微';
+  
+  const content = document.createElement('div');
+  content.className = 'message-content';
+  content.innerHTML = text;
+  
+  container.appendChild(avatar);
+  container.appendChild(content);
+  messageDiv.appendChild(container);
   
   histEl.appendChild(messageDiv);
   histEl.scrollTop = histEl.scrollHeight;
   
-  return messageDiv;
+  return content;
 }
 
 function showStatus(message, isError = false) {
   outEl.textContent = message;
-  outEl.className = 'fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg text-sm z-50';
+  outEl.className = 'status-toast show';
   setTimeout(() => {
-    outEl.className = 'hidden';
+    outEl.className = 'status-toast';
   }, 3000);
 }
 

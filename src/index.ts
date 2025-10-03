@@ -20,7 +20,6 @@ const indexHtml = `<!doctype html>
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <link rel="icon" type="image/png" href="https://s.guyue.me/img/icon_whyme.png" />
 <script src="https://cdn.tailwindcss.com"></script>
-<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
 <script>
   tailwind.config = {
     darkMode: 'class',
@@ -29,327 +28,117 @@ const indexHtml = `<!doctype html>
         colors: {
           primary: '#3B82F6',
           secondary: '#10B981',
-          accent: '#8B5CF6',
-          neutral: {
-            100: '#F3F4F6',
-            200: '#E5E7EB',
-            300: '#D1D5DB',
-            600: '#4B5563',
-            700: '#374151',
-            800: '#1F2937',
-            900: '#111827',
-          }
         },
         fontFamily: {
           sans: ['Inter', 'system-ui', 'sans-serif'],
-        },
-        animation: {
-          'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-          'fadeIn': 'fadeIn 0.3s ease forwards',
         }
       },
     }
   }
 </script>
 <style>
-  /* ========== 全局基础样式 ========== */
-  * { margin: 0; padding: 0; box-sizing: border-box; }
   body { 
     font-family: 'Inter', system-ui, sans-serif; 
-    transition: background-color 0.3s ease, color 0.3s ease; 
   }
   
-  /* ========== 滚动条美化 ========== */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-thumb { 
-    background: rgba(155, 155, 155, 0.4); 
-    border-radius: 3px; 
-  }
-  ::-webkit-scrollbar-thumb:hover { 
-    background: rgba(155, 155, 155, 0.6); 
-  }
-  
-  /* ========== 顶部导航栏渐变 ========== */
-  .header-gradient {
-    background: linear-gradient(90deg, #3B82F6 0%, #8B5CF6 100%);
-    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.25);
-  }
-  
-  /* ========== 侧边栏毛玻璃效果 ========== */
-  .sidebar-glass {
-    backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.7);
-  }
-  .dark .sidebar-glass {
-    background: rgba(31, 41, 55, 0.8);
-  }
-  
-  /* ========== 消息气泡样式 ========== */
   .message-bubble {
-    padding: 16px;
-    border-radius: 14px;
-    max-width: 85%;
-    line-height: 1.6;
-    font-size: 15px;
-    animation: fadeIn 0.3s ease forwards;
-    position: relative;
-  }
-
-  .copy-btn {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    border-radius: 6px;
-    padding: 6px 8px;
-    color: rgba(255, 255, 255, 0.8);
-    cursor: pointer;
-    font-size: 12px;
-    opacity: 0;
-    transition: all 0.2s ease;
-    backdrop-filter: blur(4px);
-  }
-
-  .message-bubble:hover .copy-btn {
-    opacity: 1;
-  }
-
-  .copy-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
-    color: white;
-    transform: scale(1.05);
-  }
-
-  .copy-btn:active {
-    transform: scale(0.95);
-  }
-
-  .copy-btn.copied {
-    background: rgba(34, 197, 94, 0.8);
-    color: white;
+    padding: 12px 16px;
+    border-radius: 8px;
+    max-width: 80%;
+    line-height: 1.5;
+    font-size: 14px;
+    margin-bottom: 8px;
   }
   
   .message-user {
-    background: linear-gradient(135deg, #3B82F6, #2563EB);
+    background: #3B82F6;
     color: white;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    margin-left: auto;
   }
   
   .message-assistant {
-    background: linear-gradient(135deg, #10B981, #059669);
-    color: white;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    background: #f3f4f6;
+    color: #374151;
+    margin-right: auto;
   }
   
-  /* ========== 输入框渐变边框 ========== */
-  .input-gradient-border {
-    border: 2px solid transparent;
-    background: linear-gradient(white, white) padding-box, 
-                linear-gradient(90deg, #3B82F6, #8B5CF6) border-box;
+  .dark .message-assistant {
+    background: #374151;
+    color: #f3f4f6;
   }
   
-  .dark .input-gradient-border {
-    background: linear-gradient(rgb(31, 41, 55), rgb(31, 41, 55)) padding-box, 
-                linear-gradient(90deg, #3B82F6, #8B5CF6) border-box;
+  .typing-indicator {
+    display: flex;
+    gap: 4px;
+    padding: 8px 0;
   }
   
-  /* ========== 按钮渐变效果 ========== */
-  .btn-gradient {
-    background: linear-gradient(90deg, #3B82F6, #8B5CF6);
-    transition: all 0.25s ease;
+  .typing-dot {
+    width: 6px;
+    height: 6px;
+    background: #9ca3af;
+    border-radius: 50%;
+    animation: typing 1.4s infinite ease-in-out;
   }
   
-  .btn-gradient:hover {
-    box-shadow: 0 0 10px rgba(139, 92, 246, 0.6);
-    transform: scale(1.05);
-  }
+  .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+  .typing-dot:nth-child(2) { animation-delay: -0.16s; }
   
-  .btn-gradient:active {
-    transform: scale(0.95);
-  }
-  
-  /* ========== 动画定义 ========== */
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  
-  /* ========== 状态提示框 ========== */
-  .status-glass {
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(8px);
-    border: none;
-    border-radius: 10px;
-    animation: fadeIn 0.3s ease forwards;
+  @keyframes typing {
+    0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+    40% { transform: scale(1); opacity: 1; }
   }
 </style>
 <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-neutral-100 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100 min-h-screen transition-colors duration-300">
-  <div class="flex flex-col h-screen max-h-screen overflow-hidden">
-    <!-- 顶部导航栏 -->
-    <header class="header-gradient text-white shadow-sm z-10 transition-all duration-300">
-      <div class="container mx-auto px-4 py-3 flex items-center justify-between">
-        <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center">
-            <img src="https://s.guyue.me/img/icon_whyme.png" alt="微米" class="w-8 h-8 rounded-full" />
-          </div>
-          <h1 class="text-xl font-bold text-white">微米</h1>
-        </div>
-        
-        <div class="flex items-center space-x-4">
-          <button id="info-btn" class="p-2 rounded-full hover:bg-white/20 transition-colors" title="关于微米">
-            <i class="fa fa-info-circle text-white"></i>
-          </button>
-          <button id="theme-toggle" class="p-2 rounded-full hover:bg-white/20 transition-colors">
-            <i class="fa fa-moon-o dark:hidden text-white"></i>
-            <i class="fa fa-sun-o hidden dark:block text-yellow-300"></i>
-          </button>
-        </div>
+<body class="bg-gray-100 dark:bg-gray-900 min-h-screen">
+  <div class="min-h-screen flex flex-col items-center justify-start p-6">
+    <!-- 简洁的标题栏 -->
+    <div class="w-full max-w-2xl mb-6">
+      <div class="flex items-center justify-between mb-4">
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">微米 AI 助手</h1>
+        <button id="theme-toggle" class="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+          <span class="dark:hidden">🌙</span>
+          <span class="hidden dark:inline">☀️</span>
+        </button>
       </div>
-    </header>
-    
-    <!-- 主聊天区域 -->
-     <main class="flex-1 flex overflow-hidden">
-       <!-- 侧边栏 - 对话历史 -->
-       <aside id="sidebar" class="w-64 sidebar-glass shadow-md z-10 transition-all duration-300 transform -translate-x-full md:translate-x-0 fixed md:static h-[calc(100%-64px)] md:h-auto">
-         <div class="p-4 border-b dark:border-neutral-700">
-           <button class="new-chat-btn w-full btn-gradient text-white py-2 px-4 rounded-lg flex items-center justify-center space-x-2" onclick="newChat()" title="新建对话">
-             <i class="fa fa-plus"></i>
-             <span>新对话</span>
-           </button>
-         </div>
-         
-         <div class="overflow-y-auto h-[calc(100%-120px)] scrollbar-hide">
-           <div class="p-3">
-             <h3 class="text-xs uppercase text-neutral-500 dark:text-neutral-400 font-semibold px-3 mb-2">最近对话</h3>
-             <ul class="space-y-1">
-               <li>
-                 <button class="w-full text-left p-3 rounded-lg bg-primary/10 text-primary font-medium hover:bg-primary/20 transition-colors">
-                   <div class="truncate">如何学习前端开发？</div>
-                 </button>
-               </li>
-               <li>
-                 <button class="w-full text-left p-3 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors">
-                   <div class="truncate">推荐几本经典的编程书籍</div>
-                 </button>
-               </li>
-               <li>
-                 <button class="w-full text-left p-3 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors">
-                   <div class="truncate">解释一下机器学习的基本概念</div>
-                 </button>
-               </li>
-             </ul>
-           </div>
-         </div>
-         
-         <div class="p-4 border-t dark:border-neutral-700 absolute bottom-0 w-full">
-           <button id="clear-history-btn" class="w-full text-neutral-600 dark:text-neutral-400 hover:text-red-500 dark:hover:text-red-400 py-2 px-4 rounded-lg flex items-center justify-center space-x-2 transition-colors">
-             <i class="fa fa-trash-o"></i>
-             <span>清除历史</span>
-           </button>
-         </div>
-       </aside>
-       
-       <!-- 聊天内容区 -->
-       <div class="flex-1 flex flex-col overflow-hidden">
-         <!-- 移动端侧边栏切换按钮 -->
-         <button id="sidebar-toggle" class="md:hidden absolute top-16 left-4 z-20 bg-white dark:bg-neutral-800 shadow-md p-2 rounded-full">
-           <i class="fa fa-bars text-neutral-600 dark:text-neutral-300"></i>
-         </button>
-         
-         <!-- 消息列表 -->
-          <div id="history" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 scrollbar-hide bg-neutral-100 dark:bg-neutral-900"></div>
+    </div>
+
+    <!-- 聊天区域 -->
+    <div class="w-full max-w-2xl bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col" style="height: 500px;">
+      <!-- 消息列表 -->
+      <div id="history" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
       
       <!-- 输入区域 -->
-         <div class="bg-white dark:bg-neutral-800 p-4 shadow-inner border-t dark:border-neutral-700">
-           <div class="max-w-3xl mx-auto">
-             <div class="flex items-end space-x-3">
-               <div class="flex-1 relative">
-                 <textarea 
-                   id="prompt" 
-                   placeholder="向微米发送消息..." 
-                   class="w-full p-3 pr-10 rounded-xl bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400 focus:outline-none focus:input-gradient-border resize-none transition-all min-h-[50px] max-h-[200px] overflow-y-auto scrollbar-hide"
-                   rows="1"
-                 ></textarea>
-                 <div class="absolute right-3 bottom-3 text-neutral-500">
-                   <i class="fa fa-smile-o hover:text-primary cursor-pointer transition-colors"></i>
-                 </div>
-               </div>
-               <button 
-                 id="sendBtn" 
-                 onclick="send()"
-                 class="btn-gradient text-white p-3 rounded-full shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                 disabled
-               >
-                 <i class="fa fa-paper-plane"></i>
-               </button>
-             </div>
-             <div class="flex justify-between items-center mt-2 text-xs text-neutral-500 dark:text-neutral-400">
-               <div>按 Enter 发送消息，Shift+Enter 换行</div>
-               <div class="flex space-x-3">
-                 <button class="hover:text-primary transition-colors">
-                   <i class="fa fa-paperclip"></i>
-                 </button>
-                 <button class="hover:text-primary transition-colors">
-                   <i class="fa fa-microphone"></i>
-                 </button>
-               </div>
-             </div>
-           </div>
-         </div>
-       </div>
-     </main>
+      <div class="border-t border-gray-200 dark:border-gray-700 p-4">
+        <div class="flex items-end space-x-3">
+          <div class="flex-1">
+            <textarea 
+              id="prompt" 
+              placeholder="向微米发送消息..." 
+              class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              rows="1"
+            ></textarea>
+          </div>
+          <button 
+            id="sendBtn" 
+            onclick="send()"
+            class="bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            disabled
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+          按 Enter 发送消息，Shift+Enter 换行
+        </div>
+      </div>
+    </div>
   </div>
   
   <div class="status" id="out"></div>
-
-   <!-- 详情模态框 -->
-   <div id="info-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-     <div class="bg-white dark:bg-neutral-800 rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all">
-       <div class="flex items-center justify-between mb-4">
-          <h3 class="text-xl font-bold text-neutral-800 dark:text-white flex items-center">
-            <img src="https://s.guyue.me/img/icon_whyme.png" alt="微米" class="w-6 h-6 rounded-full mr-2" />
-            关于微米
-          </h3>
-         <button id="close-modal" class="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-full transition-colors">
-           <i class="fa fa-times text-neutral-500 dark:text-neutral-400"></i>
-         </button>
-       </div>
-       <div class="space-y-4 text-neutral-600 dark:text-neutral-300">
-         <div class="flex items-center space-x-3">
-            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center p-1">
-              <img src="https://s.guyue.me/img/icon_whyme.png" alt="微米" class="w-full h-full rounded-full" />
-            </div>
-            <div>
-              <h4 class="font-semibold text-neutral-800 dark:text-white">微米 AI 助手</h4>
-              <p class="text-sm text-neutral-500 dark:text-neutral-400">智能对话助手</p>
-            </div>
-          </div>
-         <div class="border-t dark:border-neutral-700 pt-4">
-           <p class="text-sm leading-relaxed">
-             微米是一款基于先进AI技术的智能对话助手，能够通过对话为您提供一些信息和建议。
-           </p>
-         </div>
-         <div class="bg-neutral-50 dark:bg-neutral-700/50 rounded-lg p-4">
-           <div class="flex items-center justify-between text-sm">
-             <span class="text-neutral-500 dark:text-neutral-400">开发团队</span>
-             <a href="https://whyme.uno/" target="_blank" class="font-medium text-primary hover:text-accent transition-colors cursor-pointer">微米工作室</a>
-           </div>
-           <div class="flex items-center justify-between text-sm mt-2">
-             <span class="text-neutral-500 dark:text-neutral-400">版本</span>
-             <span class="font-medium">v1.0.0</span>
-           </div>
-         </div>
-         <div class="text-center pt-2">
-           <p class="text-xs text-neutral-400 dark:text-neutral-500">
-             © 2025 <a href="https://whyme.uno/" target="_blank" class="hover:text-primary transition-colors cursor-pointer">微米工作室</a>
-           </p>
-         </div>
-       </div>
-     </div>
-   </div>
 
   <script src="app.js"></script>
 </body>
@@ -629,30 +418,13 @@ const outEl = document.getElementById("out");
 const sendBtn = document.getElementById("sendBtn");
 const promptEl = document.getElementById("prompt");
 const themeToggle = document.getElementById('theme-toggle');
-const infoBtn = document.getElementById('info-btn');
-const infoModal = document.getElementById('info-modal');
-const closeModal = document.getElementById('close-modal');
 
 function append(role, text) {
-  const messageContainer = document.createElement('div');
-  messageContainer.className = 'flex ' + (role === 'user' ? 'justify-end' : 'justify-start') + ' mb-4';
-  
   const messageDiv = document.createElement('div');
   messageDiv.className = 'message-bubble message-' + role;
   messageDiv.innerHTML = text;
   
-  // 添加复制按钮
-  const copyBtn = document.createElement('button');
-  copyBtn.className = 'copy-btn';
-  copyBtn.innerHTML = '<i class="fa fa-copy"></i>';
-  copyBtn.title = '复制消息';
-  copyBtn.onclick = function() {
-    copyMessage(messageDiv, copyBtn);
-  };
-  
-  messageDiv.appendChild(copyBtn);
-  messageContainer.appendChild(messageDiv);
-  histEl.appendChild(messageContainer);
+  histEl.appendChild(messageDiv);
   histEl.scrollTop = histEl.scrollHeight;
   
   return messageDiv;
@@ -660,57 +432,10 @@ function append(role, text) {
 
 function showStatus(message, isError = false) {
   outEl.textContent = message;
-  outEl.className = 'status-glass show fixed bottom-6 left-1/2 transform -translate-x-1/2 text-white px-4 py-3 rounded-lg z-50';
+  outEl.className = 'fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg text-sm z-50';
   setTimeout(() => {
-    outEl.className = 'status-glass fixed bottom-6 left-1/2 transform -translate-x-1/2 text-white px-4 py-3 rounded-lg z-50 hidden';
+    outEl.className = 'hidden';
   }, 3000);
-}
-
-function copyMessage(messageDiv, copyBtn) {
-  // 获取消息文本内容，排除复制按钮
-  const copyBtnClone = copyBtn.cloneNode(true);
-  copyBtn.style.display = 'none';
-  const textContent = messageDiv.textContent || messageDiv.innerText;
-  copyBtn.style.display = '';
-  
-  // 复制到剪贴板
-  navigator.clipboard.writeText(textContent).then(() => {
-    // 显示复制成功状态
-    copyBtn.innerHTML = '<i class="fa fa-check"></i>';
-    copyBtn.classList.add('copied');
-    showStatus('消息已复制到剪贴板');
-    
-    // 2秒后恢复原状
-    setTimeout(() => {
-      copyBtn.innerHTML = '<i class="fa fa-copy"></i>';
-      copyBtn.classList.remove('copied');
-    }, 2000);
-  }).catch(err => {
-    // 如果现代API失败，使用传统方法
-    const textArea = document.createElement('textarea');
-    textArea.value = textContent;
-    document.body.appendChild(textArea);
-    textArea.select();
-    try {
-      document.execCommand('copy');
-      copyBtn.innerHTML = '<i class="fa fa-check"></i>';
-      copyBtn.classList.add('copied');
-      showStatus('消息已复制到剪贴板');
-      setTimeout(() => {
-        copyBtn.innerHTML = '<i class="fa fa-copy"></i>';
-        copyBtn.classList.remove('copied');
-      }, 2000);
-    } catch (e) {
-      showStatus('复制失败，请手动选择文本', true);
-    }
-    document.body.removeChild(textArea);
-  });
-}
-
-function newChat() {
-  histEl.innerHTML = '';
-  promptEl.value = '';
-  showStatus('新对话已开始');
 }
 
 // 主题切换功能
@@ -813,7 +538,7 @@ async function send() {
    }
  });
  
- // 更新发送按钮状态
+  // 更新发送按钮状态
   updateSendButton();
 
   // 初始化主题
@@ -822,45 +547,7 @@ async function send() {
   // 绑定主题切换事件
   if (themeToggle) {
     themeToggle.addEventListener('click', toggleTheme);
-  }
-
-  // 详情模态框事件
-  if (infoBtn) {
-    infoBtn.addEventListener('click', function() {
-      infoModal.classList.remove('hidden');
-    });
-  }
-
-  if (closeModal) {
-    closeModal.addEventListener('click', function() {
-      infoModal.classList.add('hidden');
-    });
-  }
-
-  // 点击模态框背景关闭
-  if (infoModal) {
-    infoModal.addEventListener('click', function(e) {
-      if (e.target === infoModal) {
-        infoModal.classList.add('hidden');
-      }
-    });
-  }
-
-  // ESC键关闭模态框
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && !infoModal.classList.contains('hidden')) {
-      infoModal.classList.add('hidden');
-    }
-  });
-
-  // 点击外部关闭侧边栏
-  document.addEventListener('click', function(e) {
-     const sidebar = document.getElementById('sidebar');
-     const toggle = document.querySelector('.sidebar-toggle');
-     if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !toggle.contains(e.target)) {
-       sidebar.classList.remove('open');
-     }
-   });`;
+  }`;
 
 // 静态文件内容
 const staticFiles: Record<string, { content: string; contentType: string }> = {
@@ -893,7 +580,8 @@ export default {
       const url = new URL(request.url);
       
       if (url.pathname === "/api" && request.method === "POST") {
-        const { prompt } = await request.json();
+        const requestBody = await request.json() as { prompt?: string };
+        const { prompt } = requestBody;
         if (!prompt || typeof prompt !== "string") {
           return new Response(JSON.stringify({ error: "prompt 不能为空" }), {
             headers: { "Content-Type": "application/json" },

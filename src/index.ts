@@ -426,8 +426,17 @@ const indexHtml = `<!doctype html>
               </svg>
             </button>
           </div>
-          <div class="mt-2 text-xs text-gray-500 dark:text-gray-400 text-center">
-            按 Enter 发送消息，Shift+Enter 换行
+          <div class="mt-2 flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
+            <div class="flex items-center space-x-4">
+              <span>按 Enter 发送消息，Shift+Enter 换行</span>
+            </div>
+            <!-- 登录/注册按钮 -->
+            <button id="auth-button" class="flex items-center space-x-2 px-3 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              </svg>
+              <span id="auth-button-text">登录</span>
+            </button>
           </div>
         </div>
       </div>
@@ -723,6 +732,8 @@ const registerForm = document.getElementById('register-form');
 const verifyForm = document.getElementById('verify-form');
 const userInfo = document.getElementById('user-info');
 const userEmail = document.getElementById('user-email');
+const authButton = document.getElementById('auth-button');
+const authButtonText = document.getElementById('auth-button-text');
 
 // 认证状态
 let currentUser = null;
@@ -912,8 +923,24 @@ function updateUI() {
   if (currentUser) {
     userInfo.classList.remove('hidden');
     userEmail.textContent = currentUser;
+    // 更新登录按钮状态
+    if (authButtonText) {
+      authButtonText.textContent = '已登录';
+    }
+    if (authButton) {
+      authButton.classList.add('text-green-600', 'dark:text-green-400');
+      authButton.classList.remove('text-gray-600', 'dark:text-gray-400');
+    }
   } else {
     userInfo.classList.add('hidden');
+    // 更新登录按钮状态
+    if (authButtonText) {
+      authButtonText.textContent = '登录';
+    }
+    if (authButton) {
+      authButton.classList.remove('text-green-600', 'dark:text-green-400');
+      authButton.classList.add('text-gray-600', 'dark:text-gray-400');
+    }
   }
 }
 
@@ -1087,6 +1114,19 @@ async function send() {
   // 用户操作
   document.getElementById('logout')?.addEventListener('click', logout);
   document.getElementById('view-history')?.addEventListener('click', loadHistory);
+
+  // 登录按钮事件
+  if (authButton) {
+    authButton.addEventListener('click', function() {
+      if (currentUser) {
+        // 如果已登录，显示用户菜单或直接退出
+        logout();
+      } else {
+        // 如果未登录，显示登录模态框
+        showAuthModal();
+      }
+    });
+  }
 
   // 点击输入框时检查登录状态
   promptEl.addEventListener('focus', function() {

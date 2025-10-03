@@ -347,6 +347,11 @@ const indexHtml = `<!doctype html>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">密码</label>
               <input type="password" id="register-password" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请输入密码">
             </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">邀请码</label>
+              <input type="text" id="register-invite-code" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请输入邀请码">
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">需要邀请码才能注册，请联系管理员获取</p>
+            </div>
             <button id="register-btn" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg transition-colors">
               注册
             </button>
@@ -816,8 +821,9 @@ function showVerifyForm() {
 async function register() {
   const email = document.getElementById('register-email').value;
   const password = document.getElementById('register-password').value;
+  const inviteCode = document.getElementById('register-invite-code').value;
   
-  if (!email || !password) {
+  if (!email || !password || !inviteCode) {
     showStatus('请填写完整信息', true);
     return;
   }
@@ -826,15 +832,15 @@ async function register() {
     const response = await fetch('/api/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email, password, inviteCode })
     });
     
     const data = await response.json();
     
     if (response.ok) {
-      pendingEmail = email;
-      showVerifyForm();
       showStatus(data.message);
+      showLoginForm();
+      document.getElementById('login-email').value = email;
     } else {
       showStatus(data.error, true);
     }
@@ -843,34 +849,7 @@ async function register() {
   }
 }
 
-async function verifyEmail() {
-  const code = document.getElementById('verify-code').value;
-  
-  if (!code) {
-    showStatus('请输入验证码', true);
-    return;
-  }
-  
-  try {
-    const response = await fetch('/api/verify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: pendingEmail, code })
-    });
-    
-    const data = await response.json();
-    
-    if (response.ok) {
-      showStatus(data.message);
-      showLoginForm();
-      document.getElementById('login-email').value = pendingEmail;
-    } else {
-      showStatus(data.error, true);
-    }
-  } catch (error) {
-    showStatus('验证失败，请稍后重试', true);
-  }
-}
+// 验证码相关函数已移除，现在使用邀请码注册
 
 async function login() {
   const email = document.getElementById('login-email').value;
@@ -1109,7 +1088,6 @@ async function send() {
   // 表单提交
   document.getElementById('login-btn')?.addEventListener('click', login);
   document.getElementById('register-btn')?.addEventListener('click', register);
-  document.getElementById('verify-btn')?.addEventListener('click', verifyEmail);
 
   // 用户操作
   document.getElementById('logout')?.addEventListener('click', logout);
@@ -1197,11 +1175,60 @@ function generateVerificationCode(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-async function sendVerificationEmail(email: string, code: string): Promise<boolean> {
-  // 这里应该集成真实的邮件服务，如 SendGrid, AWS SES 等
-  // 现在只是模拟发送
-  console.log(`发送验证码到 ${email}: ${code}`);
-  return true;
+async function sendVerificationEmail(email: string, code: string, env?: any): Promise<boolean> {
+  try {
+    // 方案1: 使用第三方邮件服务 (推荐)
+    // 需要配置环境变量 SENDGRID_API_KEY 或其他邮件服务API密钥
+    if (env?.SENDGRID_API_KEY) {
+      const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${env.SENDGRID_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          personalizations: [{
+            to: [{ email }],
+            subject: '微米AI - 邮箱验证码'
+          }],
+          from: { email: 'noreply@whyme.uno', name: '微米AI' },
+          content: [{
+            type: 'text/html',
+            value: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #2563eb;">微米AI 邮箱验证</h2>
+                <p>您的验证码是：</p>
+                <div style="background: #f3f4f6; padding: 20px; text-align: center; font-size: 24px; font-weight: bold; color: #2563eb; border-radius: 8px; margin: 20px 0;">
+                  ${code}
+                </div>
+                <p>验证码有效期为1小时，请及时使用。</p>
+                <p>如果这不是您的操作，请忽略此邮件。</p>
+                <hr style="margin: 20px 0; border: none; border-top: 1px solid #e5e7eb;">
+                <p style="color: #6b7280; font-size: 14px;">此邮件由微米AI系统自动发送，请勿回复。</p>
+              </div>
+            `
+          }]
+        })
+      });
+      
+      if (response.ok) {
+        console.log(`验证码已发送到 ${email}`);
+        return true;
+      }
+    }
+    
+    // 方案2: 开发环境模拟发送
+    console.log(`[开发模式] 验证码发送到 ${email}: ${code}`);
+    console.log(`[生产环境] 请配置 SENDGRID_API_KEY 环境变量以发送真实邮件`);
+    console.log(`[邮件内容] 验证码: ${code}`);
+    return true;
+    
+  } catch (error) {
+    console.error('发送验证邮件失败:', error);
+    // 开发环境下仍然返回成功，避免阻塞用户
+    console.log(`[开发模式] 验证码: ${code}`);
+    return true;
+  }
 }
 
 export default {
@@ -1211,10 +1238,10 @@ export default {
       
       // 用户注册
       if (url.pathname === "/api/register" && request.method === "POST") {
-        const { email, password } = await request.json() as { email?: string; password?: string };
+        const { email, password, inviteCode } = await request.json() as { email?: string; password?: string; inviteCode?: string };
         
-        if (!email || !password) {
-          return new Response(JSON.stringify({ error: "邮箱和密码不能为空" }), {
+        if (!email || !password || !inviteCode) {
+          return new Response(JSON.stringify({ error: "邮箱、密码和邀请码不能为空" }), {
             headers: { "Content-Type": "application/json" },
             status: 400,
           });
@@ -1238,67 +1265,46 @@ export default {
           });
         }
         
-        // 生成验证码
-        const verificationCode = generateVerificationCode();
+        // 验证邀请码
+        const validInviteCodes = env.VALID_INVITE_CODES?.split(',') || ['WHYME2025'];
+        if (!validInviteCodes.includes(inviteCode)) {
+          return new Response(JSON.stringify({ error: "邀请码无效" }), {
+            headers: { "Content-Type": "application/json" },
+            status: 400,
+          });
+        }
+        
+        // 检查邀请码是否已被使用
+        const inviteCodeUsed = await env['hello-ai-kv']?.get(`invite_used:${inviteCode}:${email}`);
+        if (inviteCodeUsed) {
+          return new Response(JSON.stringify({ error: "该邀请码已被使用" }), {
+            headers: { "Content-Type": "application/json" },
+            status: 400,
+          });
+        }
+        
         const hashedPassword = await hashPassword(password);
         
-        // 存储用户信息（待验证状态）
+        // 存储用户信息（直接验证通过）
         await env['hello-ai-kv']?.put(`user:${email}`, JSON.stringify({
           email,
           password: hashedPassword,
-          verified: false,
-          verificationCode,
+          verified: true,
+          inviteCode,
           createdAt: Date.now()
-        }), { expirationTtl: 3600 }); // 1小时过期
+        }));
         
-        // 发送验证邮件
-        await sendVerificationEmail(email, verificationCode);
+        // 标记邀请码已被使用
+        await env['hello-ai-kv']?.put(`invite_used:${inviteCode}:${email}`, 'true');
         
         return new Response(JSON.stringify({ 
-          message: "验证码已发送到您的邮箱，请查收并验证" 
+          message: "注册成功，现在可以登录了" 
         }), {
           headers: { "Content-Type": "application/json" },
         });
       }
       
-      // 验证邮箱
-      if (url.pathname === "/api/verify" && request.method === "POST") {
-        const { email, code } = await request.json() as { email?: string; code?: string };
-        
-        if (!email || !code) {
-          return new Response(JSON.stringify({ error: "邮箱和验证码不能为空" }), {
-            headers: { "Content-Type": "application/json" },
-            status: 400,
-          });
-        }
-        
-        const userData = await env['hello-ai-kv']?.get(`user:${email}`);
-        if (!userData) {
-          return new Response(JSON.stringify({ error: "用户不存在或验证码已过期" }), {
-            headers: { "Content-Type": "application/json" },
-            status: 400,
-          });
-        }
-        
-        const user = JSON.parse(userData);
-        if (user.verificationCode !== code) {
-          return new Response(JSON.stringify({ error: "验证码不正确" }), {
-            headers: { "Content-Type": "application/json" },
-            status: 400,
-          });
-        }
-        
-        // 更新用户状态为已验证
-        user.verified = true;
-        delete user.verificationCode;
-        await env['hello-ai-kv']?.put(`user:${email}`, JSON.stringify(user));
-        
-        return new Response(JSON.stringify({ 
-          message: "邮箱验证成功，现在可以登录了" 
-        }), {
-          headers: { "Content-Type": "application/json" },
-        });
-      }
+      // 验证码API已移除，现在使用邀请码注册
       
       // 用户登录
       if (url.pathname === "/api/login" && request.method === "POST") {

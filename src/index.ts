@@ -1138,10 +1138,19 @@ async function send() {
   // 点击模态框背景关闭
   if (authModal) {
     authModal.addEventListener('click', function(e) {
+      // 只有当点击的是模态框背景本身时才关闭，不包括其子元素
       if (e.target === authModal) {
         hideAuthModal();
       }
     });
+    
+    // 防止在模态框内容区域内的操作触发关闭
+    const modalContent = authModal.querySelector('.bg-white, .dark\\:bg-gray-800');
+    if (modalContent) {
+      modalContent.addEventListener('click', function(e) {
+        e.stopPropagation();
+      });
+    }
   }`;
 
 // 静态文件内容
